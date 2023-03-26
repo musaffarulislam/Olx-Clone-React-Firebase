@@ -1,19 +1,33 @@
 import React, { useState,useContext } from 'react';
+import { useHistory } from 'react-router-dom';
 
 import Logo from '../../olx-logo.png';
-import { FirebaseContext } from '../../store/FirebaseContext';
+import { FirebaseContext } from '../../store/Context';
 import './Signup.css';
 
 export default function Signup() {
+  const history = useHistory()
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState()
   const [password, setPassword] = useState('');
   const {app} = useContext(FirebaseContext)
 
-  const handleSubmit =(e)=>{
+  const handleSubmit = (e) => {
     e.preventDefault()
-    console.log(app);
+    app.auth().createUserWithEmailAndPassword(email, password)
+      .then((result) => {
+        result.user.updateProfile({ displayName: username }).then(()=>{
+          app.firestore().collection('users').add({
+            id:result.user.uid,
+            username:username,
+            phone:phone
+          }).then(()=>{
+            history.push('/login')
+          })
+
+        })
+      })
   }
 
   return (

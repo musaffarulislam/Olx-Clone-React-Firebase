@@ -1,4 +1,5 @@
-import React from 'react';
+import React,{useContext} from 'react';
+import { useHistory } from 'react-router-dom';
 
 import './Header.css';
 import OlxLogo from '../../assets/OlxLogo';
@@ -6,7 +7,11 @@ import Search from '../../assets/Search';
 import Arrow from '../../assets/Arrow';
 import SellButton from '../../assets/SellButton';
 import SellButtonPlus from '../../assets/SellButtonPlus';
+import { AuthContext, FirebaseContext } from '../../store/Context';
 function Header() {
+  const {user} =useContext(AuthContext)
+  const {app} = useContext(FirebaseContext)
+  const history = useHistory()
   return (
     <div className="headerParentDiv">
       <div className="headerChildDiv">
@@ -34,10 +39,14 @@ function Header() {
           <Arrow></Arrow>
         </div>
         <div className="loginPage">
-          <span>Login</span>
+          {user ? <span>Welcom {user.displayName}</span>: <span onClick={()=>{
+            history.push('/login')
+          }}>Login</span>}
           <hr />
         </div>
-
+        {user && <span onClick={()=>{
+          app.auth().signOut();
+        }}>Logout</span>}
         <div className="sellMenu">
           <SellButton></SellButton>
           <div className="sellMenuContent">
